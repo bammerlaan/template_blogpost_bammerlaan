@@ -1,0 +1,194 @@
+% !TeX program = lualatex
+
+% Warning: template parts using for loops give an error when they are indented.
+%See when having trouble using graphicx with invoice: http://tex.stackexchange.com/questions/61113/using-graphicx-with-invoice-results-in-strange-pdf-output
+
+\documentclass[paper=a4,fontsize=11pt,DIV=12]{scrlttr2}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[gen]{eurosym}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{microtype}
+\usepackage{dcolumn}
+\usepackage{booktabs}
+\usepackage[dutch]{babel}
+\usepackage{underscore}
+%\usepackage{float, caption}
+\usepackage{graphicx}
+%\usepackage{invoice_bammerlaan}
+\usepackage{fp}
+\usepackage{changepage} % Allow moving table slightly to left
+\usepackage{fontspec} % Load fontspec for Roboto Light font
+\setmainfont[BoldFont={Roboto-Regular.ttf}]{Roboto-Light.ttf}
+\usepackage{mathastext}
+\usepackage{wallpaper}
+
+\LoadLetterOption{DINmtext}
+\KOMAoptions{enlargefirstpage=true,fromalign=right,fromphone=true,fromemail=true,fromurl=true,fromlogo=true,backaddress=false,parskip=half*,firstfoot=true}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set global variables here:
+
+% (Company) Name
+\setkomavar{fromname}{Voornaam Achternaam, beroep}
+% Address
+\setkomavar{fromaddress}{%
+	Straatnaam 1\\
+	1234 AB Stadsnaam
+}
+% Phone number
+\setkomavar{fromphone}{06 123 456 78}
+% E-mail address
+\setkomavar{fromemail}{test@test.nl}
+% Bank account number
+\setkomavar{frombank}{NL12 TEST 1234 5678 90}
+% Website
+\setkomavar{fromurl}{http://www.bammerlaan.nl}
+% Chamber of commerce number
+\newcommand{\KVKNummer}{12345678}
+% VAT number
+\newcommand{\BTWNummer}{NL123456789A01}
+
+%%%%%%%% Files %%%%%%%%
+
+% Path to LaTeX template (so graphics can also be found when run from another directory) (REPLACE WITH YOUR OWN):
+\graphicspath{ {/home/user/yourdirectoryhere} }
+
+% Path to background image
+\ULCornerWallPaper{1}{achtergrond_facuur.pdf}
+
+% Path to logo
+\setkomavar{fromlogo}{\includegraphics[]{Bas_zang_logo_v6-3_alleen_vierkant.pdf}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\setkomavar{firstfoot}{%
+	\parbox[t]{\textwidth}{\footnotesize
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{KVK-nummer: \KVKNummer{}}
+		\end{tabular}%
+		\hfill
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{IBAN: \usekomavar{frombank}}
+		\end{tabular}%
+		\hfill
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{BTW-nummer: 
+				\BTWNummer{}}
+		\end{tabular}%
+	}%
+}
+
+
+% Maak datum van factuur-entries Nederlands - zie http://tex.stackexchange.com/questions/54594/tex-capacity-exceeded-while-parsing-a-date-string
+\def\parsedate#1{\edef\temp{#1}%
+	\expandafter\parsedateX\temp\relax}
+\def\parsedateX #1-#2-#3\relax{%
+	\def\dueyear{#1}%
+	\def\duemonth{#2}%
+	\def\dueday{#3}}
+
+% Zorg dat "Met vriendelijke groet," niet wordt geïndenteerd
+\renewcommand*{\raggedsignature}{\raggedright}
+
+
+\begin{document}
+	
+	\begin{letter}{Aan:\\
+			Klantnaam\\
+Straatnaam 2\\
+5678 CD Plaatsnaam\\
+		}
+		
+		
+%		\setkomavar{subject}{%
+%			None}
+		\setkomavar{subject}{Factuur}		
+		\setkomavar{invoice}[Factuurnummer]{46}
+		
+		\opening{Geachte heer/mevrouw,}
+		
+		Ik verzoek u vriendelijk het verschuldigde bedrag binnen 30 dagen over te maken op rekeningnummer \usekomavar{frombank} op naam van \textbf{Voornaam Achternaam, beroep} onder vermelding van uw \underline{naam} en het \underline{factuurnummer}.
+			
+	\begin{adjustwidth}{-2em}{} % Move table slightly left	
+		\begin{tabular}{
+				l
+				p{10em}
+				D{,}{,}{2}
+				l
+				l
+				D{,}{,}{2}
+				l
+				l
+			}
+			\multicolumn{1}{p{5em}}{\flushleft Datum} & % DATUM
+			\multicolumn{1}{p{10em}}{\flushleft Omschrijving} & % OMSCHRIJVING
+			\multicolumn{1}{p{3em}}{\flushleft Aantal} & % AANTAL
+			\multicolumn{1}{p{3em}}{\flushleft Prijs\\per stuk} & % PRIJS PER EENHEID
+			\multicolumn{1}{p{5em}}{\flushleft Totaal-\\bedrag\\excl. BTW} & % BEDRAG EXCL. BTW
+			\multicolumn{1}{p{3em}}{\flushleft BTW-\\tarief} & % GEBRUIKTE BTW-TARIEF
+			\multicolumn{1}{p{3em}}{\flushleft BTW-\\bedrag} & % HOOGTE TOEGEVOEGDE BTW
+			\multicolumn{1}{p{5em}}{\flushleft Totaal-\\bedrag\\incl. BTW}\\ \midrule % TOTAAL INCL. BTW
+\parsedate{2020-05-22} \dueday-\duemonth-\dueyear & % DATUM
+Product 1 & % OMSCHRIJVING
+1 & % AANTAL
+\euro{} 55,00 & % PRIJS PER EENHEID
+\euro{} 55,00 & % TOTAALBEDRAG EXCL. BTW
+9\% & % GEBRUIKTE BTW-TARIEF
+\euro{} 4,95 & % HOOGTE TOEGEVOEGDE BTW
+%Stichting Barokconcerten Nederland 
+\euro{} 59,95 \\ % TOTAALBEDRAG INCL. BTW
+\parsedate{2020-05-23} \dueday-\duemonth-\dueyear & % DATUM
+Product 1 & % OMSCHRIJVING
+1 & % AANTAL
+\euro{} 55,00 & % PRIJS PER EENHEID
+\euro{} 55,00 & % TOTAALBEDRAG EXCL. BTW
+9\% & % GEBRUIKTE BTW-TARIEF
+\euro{} 4,95 & % HOOGTE TOEGEVOEGDE BTW
+%Stichting Barokconcerten Nederland 
+\euro{} 59,95 \\ % TOTAALBEDRAG INCL. BTW
+\parsedate{2020-05-24} \dueday-\duemonth-\dueyear & % DATUM
+Product 2 & % OMSCHRIJVING
+1 & % AANTAL
+\euro{} 170,00 & % PRIJS PER EENHEID
+\euro{} 170,00 & % TOTAALBEDRAG EXCL. BTW
+9\% & % GEBRUIKTE BTW-TARIEF
+\euro{} 15,30 & % HOOGTE TOEGEVOEGDE BTW
+%Stichting Barokconcerten Nederland 
+\euro{} 185,30 \\ % TOTAALBEDRAG INCL. BTW
+\parsedate{2020-05-25} \dueday-\duemonth-\dueyear & % DATUM
+Product 2 & % OMSCHRIJVING
+1 & % AANTAL
+\euro{} 170,00 & % PRIJS PER EENHEID
+\euro{} 170,00 & % TOTAALBEDRAG EXCL. BTW
+9\% & % GEBRUIKTE BTW-TARIEF
+\euro{} 15,30 & % HOOGTE TOEGEVOEGDE BTW
+%Stichting Barokconcerten Nederland 
+\euro{} 185,30 \\ % TOTAALBEDRAG INCL. BTW
+\parsedate{2020-05-26} \dueday-\duemonth-\dueyear & % DATUM
+Product 2 & % OMSCHRIJVING
+1 & % AANTAL
+\euro{} 170,00 & % PRIJS PER EENHEID
+\euro{} 170,00 & % TOTAALBEDRAG EXCL. BTW
+9\% & % GEBRUIKTE BTW-TARIEF
+\euro{} 15,30 & % HOOGTE TOEGEVOEGDE BTW
+%Stichting Barokconcerten Nederland 
+\euro{} 185,30 \\ % TOTAALBEDRAG INCL. BTW
+			\midrule
+			&	Subtotaal	& &	 & \euro{} 620,00	&       &  \euro{} 55,80     &	\euro{} 675,80\\ \cmidrule{8-8}
+%			&	+ BTW &	&  &     &   &    &	\euro{} 55,80 \\ \cmidrule{8-8}
+			&	\large\textbf{Totaal te voldoen} &		&  &     &    &   &	\textbf{\scalebox{1.2}{\euro{} 675,80}} \\
+
+% INDIEN KORTING:			
+			
+%			&	\multicolumn{2}{l}{Extra korting} &  & &   &   &	\euro{} 62,00 \\ \cmidrule{8-8}
+%			&	\textbf{Totaal te voldoen met aftrek van korting} &  & &   &   &	& \euro{} 613,80
+		\end{tabular}
+	\end{adjustwidth}				
+		\closing{Met vriendelijke groet,}
+	\end{letter}
+\end{document}
