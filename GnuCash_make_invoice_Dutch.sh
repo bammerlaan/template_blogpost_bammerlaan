@@ -2,7 +2,9 @@
 # Dit script neemt factuurnummer in, stuurt dat naar gcinvoice voor LaTeX, maakt er een LaTeXbestand van en 
 # maakt daar vervolgens een .pdf-bestand van met in de bestandsnaam het factuurnummer en de datum.
 # Het programma biedt vervolgens de keuze om het pdf-bestand weer te geven.
-# Vul hieronder de locatie van je GnuCash-database en je sjabloon in, en de locatie waar je je facturen geplaatst wilt hebben.
+# 
+# Vul hieronder de locatie van je GnuCash-database en je LaTeX-sjabloon in. Geef ook aan in welke map je 
+# je facturen geplaatst wilt hebben.
 
 
 clear
@@ -19,14 +21,11 @@ case $FACTUURNUMMER in
     *) echo "Factuurnummer: "$FACTUURNUMMER, datum: $DATUM ;;
 esac
 
-# Vul hier de locatie van je GnuCash-Database in:
-GNUCASHDATABASE="/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan_zangles/Gnucash_boekhouding/Boekhouding_Bas_Ammerlaan,_Zanger.gnucash"
+GNUCASHDATABASE="/plaats/van/je/database.gnucash"
 
-# Vul hier de locatie van je LaTeX-sjabloon in:
-GCINVOICETEMPLATE="/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan_zangles/Gnucash_boekhouding/Facturen/LaTeX_template/invoice.tex"
+GCINVOICETEMPLATE="/plaats/van/je/sjabloon.tex"
 
-# Vul hier in waar je je facturen geplaatst wilt hebben:
-FACTURENMAP="/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan_zangles/Gnucash_boekhouding/Facturen/LaTeX/"
+FACTURENMAP="/waar/je/je/facturen/wilt/plaatsen/"
 
 create_gcinvoice -g "$GNUCASHDATABASE" -t "$GCINVOICETEMPLATE" -o "$FACTURENMAP"/Factuur_"$FACTUURNUMMER"_"$DATUM".tex  $FACTUURNUMMER
 
