@@ -18,7 +18,7 @@ DATUM=$(date +%d-%m-%Y)
 # Check if FACTUURNUMMER is a number
 case $FACTUURNUMMER in 
     ''|*[!0-9]*) echo "This is not a number. Try again."; exit 1 ;;
-    *) echo "Factuurnummer: "$FACTUURNUMMER, datum: $DATUM ;;
+    *) echo "Invoice number: "$FACTUURNUMMER, date: $DATUM ;;
 esac
 
 # Fill in the location of your GnuCash-database below:
@@ -27,7 +27,7 @@ GNUCASHDATABASE="/location/of/database.gnucash"
 # Fill in the location of your template below:
 GCINVOICETEMPLATE="/location/of/template.tex"
 
-# Fill in where you want your invoices to be placed below:
+# Fill in where you want your created invoices to be placed below:
 FACTURENMAP="/location/of/target/directory/"
 
 create_gcinvoice -g "$GNUCASHDATABASE" -t "$GCINVOICETEMPLATE" -o "$FACTURENMAP"/Invoice_"$FACTUURNUMMER"_"$DATUM".tex  $FACTUURNUMMER
