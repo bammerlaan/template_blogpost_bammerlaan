@@ -1,0 +1,176 @@
+% !TeX program = lualatex
+
+% Warning: template parts using for loops give an error when they are indented.
+%See when having trouble using graphicx with invoice: http://tex.stackexchange.com/questions/61113/using-graphicx-with-invoice-results-in-strange-pdf-output
+
+\documentclass[paper=a4,fontsize=11pt,DIV=12]{scrlttr2}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[gen]{eurosym}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{microtype}
+\usepackage{dcolumn}
+\usepackage{booktabs}
+\usepackage[english]{babel}
+\usepackage{underscore}
+%\usepackage{float, caption}
+\usepackage{graphicx}
+%\usepackage{invoice_bammerlaan}
+\usepackage{fp}
+\usepackage{changepage} % Allow moving table slightly to left
+\usepackage{fontspec} % Load fontspec for Roboto Light font
+\setmainfont[BoldFont={Roboto-Regular.ttf}]{Roboto-Light.ttf}
+\usepackage{mathastext}
+\usepackage{wallpaper}
+
+\LoadLetterOption{DINmtext}
+\KOMAoptions{enlargefirstpage=true,fromalign=right,fromphone=true,fromemail=true,fromurl=true,fromlogo=true,backaddress=false,parskip=half*,firstfoot=true}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set global variables here:
+
+% (Company) Name
+\setkomavar{fromname}{Firstname Lastname, occupation}
+% Address
+\setkomavar{fromaddress}{%
+	Streetname 1\\
+	1234 AB City Name
+}
+% Phone number
+\setkomavar{fromphone}{06 123 456 78}
+% E-mail address
+\setkomavar{fromemail}{test@test.nl}
+% Bank account number
+\setkomavar{frombank}{NL12 TEST 1234 5678 90}
+% Website
+\setkomavar{fromurl}{http://www.bammerlaan.nl}
+% Chamber of commerce number
+\newcommand{\KVKNummer}{12345678}
+% VAT number
+\newcommand{\BTWNummer}{NL123456789A01}
+
+%%%%%%%% Files %%%%%%%%
+
+% Path to LaTeX template (so graphics can also be found when run from another directory) (REPLACE WITH YOUR OWN):
+\graphicspath{ {/home/user/yourdirectoryhere} }
+
+% Path to background image
+\ULCornerWallPaper{1}{achtergrond_facuur.pdf}
+
+% Path to logo
+\setkomavar{fromlogo}{\includegraphics[]{Bas_zang_logo_v6-3_alleen_vierkant.pdf}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\setkomavar{firstfoot}{%
+	\parbox[t]{\textwidth}{\footnotesize
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{Chamber of commerce: \KVKNummer{}}
+		\end{tabular}%
+		\hfill
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{IBAN: \usekomavar{frombank}}
+		\end{tabular}%
+		\hfill
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{VAR number: 
+				\BTWNummer{}}
+		\end{tabular}%
+	}%
+}
+
+
+% Uncomment for European date entries. Also uncomment line starting with "\parsedate}" below. --- see: http://tex.stackexchange.com/questions/54594/tex-capacity-exceeded-while-parsing-a-date-string
+%\def\parsedate#1{\edef\temp{#1}%
+%	\expandafter\parsedateX\temp\relax}
+%\def\parsedateX #1-#2-#3\relax{%
+%	\def\dueyear{#1}%
+%	\def\duemonth{#2}%
+%	\def\dueday{#3}}
+
+% Prevent indentation of signature: 
+\renewcommand*{\raggedsignature}{\raggedright}
+
+
+\begin{document}
+	
+	\begin{letter}{To:\\
+			@{owner['full_name']}\\
+%+ for a in owner['address']:
+@{a}\\
+%-
+		}
+		
+		
+%		\setkomavar{subject}{%
+%			@{notes}}
+		\setkomavar{subject}{Invoice}		
+		\setkomavar{invoice}[Invoice number]{@{id}}
+		
+		\opening{Dear sir/madam,}
+		
+		@{terms['desc']}
+			
+	\begin{adjustwidth}{-2em}{} % Move table slightly left	
+		\begin{tabular}{
+				l
+				p{10em}
+				D{,}{,}{2}
+				l
+				l
+				D{,}{,}{2}
+				l
+				l
+			}
+			\multicolumn{1}{p{5em}}{\flushleft Date} & % Date
+			\multicolumn{1}{p{10em}}{\flushleft Description} & % Description
+			\multicolumn{1}{p{3em}}{\flushleft Amount} & % Amount
+			\multicolumn{1}{p{3em}}{\flushleft Unit price} & % Unit price
+			\multicolumn{1}{p{5em}}{\flushleft Amount without tax} & % Amount without tax
+			\multicolumn{1}{p{3em}}{\flushleft Tax\\rate} & % Tax rate
+			\multicolumn{1}{p{3em}}{\flushleft Tax\\amount} & % Tax amount
+			\multicolumn{1}{p{5em}}{\flushleft Total price\\with\\taxes}\\ \midrule % Total price with taxes
+%+ for e in entries:
+@{e['date']} & % Date
+% Comment the above and uncomment the below for European dates:
+%\parsedate{@{e['date']}} \dueday-\duemonth-\dueyear & % Date
+@{e['description']} & % Description
+@{e['qty']} & % Amount
+\euro{} @{e['price']} & % Unit price
+\euro{} @{e['amount_net']} & % Amount without tax
+@{e['taxtable']['percent_sum']}\% & % GEBRUIKTE BTW-TARIEF
+\euro{} @{e['amount_taxes']} & % Tax rate
+%@{owner['full_name']} 
+\euro{} @{e['amount_gross']} \\ % Total price with taxes
+%-
+			\midrule
+			&	Sub-total	& &	 & \euro{} @{amount_net}	&       &  \euro{} @{amount_taxes}     &	\euro{} @{amount_gross}\\ \cmidrule{8-8}
+%			&	+ BTW &	&  &     &   &    &	\euro{} @{amount_taxes} \\ \cmidrule{8-8}
+			&	\large\textbf{Amount due} &		&  &     &    &   &	\textbf{\scalebox{1.2}{\euro{} @{amount_gross}}} \\
+
+% If discount:			
+			
+%			&	\multicolumn{2}{l}{Extra korting} &  & &   &   &	\euro{} @{cformat(Decimal('0.1') * amount_net_)} \\ \cmidrule{8-8}
+%			&	\textbf{Totaal te voldoen met aftrek van korting} &  & &   &   &	& \euro{} @{cformat(amount_gross_ - Decimal('0.1') * amount_net_)}
+		\end{tabular}
+	\end{adjustwidth}		
+		
+		% See if a QR code exists, if yes, print in the paper. Replace directory below with your own. Replace any underscores (_) with (\string_) because of the underscore package.
+		\IfFileExists{/path/to/your/invoice/directory/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
+		{
+			You can also pay by scanning this QR code with the smartphone app of your bank:
+			\begin{center}
+				\includegraphics[width=4cm]{/path/to/your/invoice/directory/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
+			\end{center}
+		}
+		{
+			% (Anything here will be run if file is not present.)
+		}
+				
+		\closing{Yours sincerely,}
+	\end{letter}
+\end{document}

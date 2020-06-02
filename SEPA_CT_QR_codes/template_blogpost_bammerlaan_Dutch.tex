@@ -1,0 +1,174 @@
+% !TeX program = lualatex
+
+% Warning: template parts using for loops give an error when they are indented.
+%See when having trouble using graphicx with invoice: http://tex.stackexchange.com/questions/61113/using-graphicx-with-invoice-results-in-strange-pdf-output
+
+\documentclass[paper=a4,fontsize=11pt,DIV=12]{scrlttr2}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[gen]{eurosym}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage{microtype}
+\usepackage{dcolumn}
+\usepackage{booktabs}
+\usepackage[dutch]{babel}
+\usepackage{underscore}
+%\usepackage{float, caption}
+\usepackage{graphicx}
+%\usepackage{invoice_bammerlaan}
+\usepackage{fp}
+\usepackage{changepage} % Allow moving table slightly to left
+\usepackage{fontspec} % Load fontspec for Roboto Light font
+\setmainfont[BoldFont={Roboto-Regular.ttf}]{Roboto-Light.ttf}
+\usepackage{mathastext}
+\usepackage{wallpaper}
+
+\LoadLetterOption{DINmtext}
+\KOMAoptions{enlargefirstpage=true,fromalign=right,fromphone=true,fromemail=true,fromurl=true,fromlogo=true,backaddress=false,parskip=half*,firstfoot=true}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set global variables here:
+
+% (Company) Name
+\setkomavar{fromname}{Voornaam Achternaam, beroep}
+% Address
+\setkomavar{fromaddress}{%
+	Straatnaam 1\\
+	1234 AB Stadsnaam
+}
+% Phone number
+\setkomavar{fromphone}{06 123 456 78}
+% E-mail address
+\setkomavar{fromemail}{test@test.nl}
+% Bank account number
+\setkomavar{frombank}{NL12 TEST 1234 5678 90}
+% Website
+\setkomavar{fromurl}{http://www.bammerlaan.nl}
+% Chamber of commerce number
+\newcommand{\KVKNummer}{12345678}
+% VAT number
+\newcommand{\BTWNummer}{NL123456789A01}
+
+%%%%%%%% Files %%%%%%%%
+
+% Path to LaTeX template (so graphics can also be found when run from another directory) (REPLACE WITH YOUR OWN):
+\graphicspath{ {/home/user/yourdirectoryhere} }
+
+% Path to background image
+\ULCornerWallPaper{1}{achtergrond_facuur.pdf}
+
+% Path to logo
+\setkomavar{fromlogo}{\includegraphics[]{Bas_zang_logo_v6-3_alleen_vierkant.pdf}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\setkomavar{firstfoot}{%
+	\parbox[t]{\textwidth}{\footnotesize
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{KVK-nummer: \KVKNummer{}}
+		\end{tabular}%
+		\hfill
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{IBAN: \usekomavar{frombank}}
+		\end{tabular}%
+		\hfill
+		\begin{tabular}[t]{l@{}}%
+			\multicolumn{1}{@{}l@{}}{BTW-nummer: 
+				\BTWNummer{}}
+		\end{tabular}%
+	}%
+}
+
+
+% Maak datum van factuur-entries Nederlands - zie http://tex.stackexchange.com/questions/54594/tex-capacity-exceeded-while-parsing-a-date-string
+\def\parsedate#1{\edef\temp{#1}%
+	\expandafter\parsedateX\temp\relax}
+\def\parsedateX #1-#2-#3\relax{%
+	\def\dueyear{#1}%
+	\def\duemonth{#2}%
+	\def\dueday{#3}}
+
+% Zorg dat "Met vriendelijke groet," niet wordt geïndenteerd
+\renewcommand*{\raggedsignature}{\raggedright}
+
+
+\begin{document}
+	
+	\begin{letter}{Aan:\\
+			@{owner['full_name']}\\
+%+ for a in owner['address']:
+@{a}\\
+%-
+		}
+		
+		
+%		\setkomavar{subject}{%
+%			@{notes}}
+		\setkomavar{subject}{Factuur}		
+		\setkomavar{invoice}[Factuurnummer]{@{id}}
+		
+		\opening{Geachte heer/mevrouw,}
+		
+		@{terms['desc']}
+			
+	\begin{adjustwidth}{-2em}{} % Move table slightly left	
+		\begin{tabular}{
+				l
+				p{10em}
+				D{,}{,}{2}
+				l
+				l
+				D{,}{,}{2}
+				l
+				l
+			}
+			\multicolumn{1}{p{5em}}{\flushleft Datum} & % DATUM
+			\multicolumn{1}{p{10em}}{\flushleft Omschrijving} & % OMSCHRIJVING
+			\multicolumn{1}{p{3em}}{\flushleft Aantal} & % AANTAL
+			\multicolumn{1}{p{3em}}{\flushleft Prijs\\per stuk} & % PRIJS PER EENHEID
+			\multicolumn{1}{p{5em}}{\flushleft Totaal-\\bedrag\\excl. BTW} & % BEDRAG EXCL. BTW
+			\multicolumn{1}{p{3em}}{\flushleft BTW-\\tarief} & % GEBRUIKTE BTW-TARIEF
+			\multicolumn{1}{p{3em}}{\flushleft BTW-\\bedrag} & % HOOGTE TOEGEVOEGDE BTW
+			\multicolumn{1}{p{5em}}{\flushleft Totaal-\\bedrag\\incl. BTW}\\ \midrule % TOTAAL INCL. BTW
+%+ for e in entries:
+\parsedate{@{e['date']}} \dueday-\duemonth-\dueyear & % DATUM
+@{e['description']} & % OMSCHRIJVING
+@{e['qty']} & % AANTAL
+\euro{} @{e['price']} & % PRIJS PER EENHEID
+\euro{} @{e['amount_net']} & % TOTAALBEDRAG EXCL. BTW
+@{e['taxtable']['percent_sum']}\% & % GEBRUIKTE BTW-TARIEF
+\euro{} @{e['amount_taxes']} & % HOOGTE TOEGEVOEGDE BTW
+%@{owner['full_name']} 
+\euro{} @{e['amount_gross']} \\ % TOTAALBEDRAG INCL. BTW
+%-
+			\midrule
+			&	Subtotaal	& &	 & \euro{} @{amount_net}	&       &  \euro{} @{amount_taxes}     &	\euro{} @{amount_gross}\\ \cmidrule{8-8}
+%			&	+ BTW &	&  &     &   &    &	\euro{} @{amount_taxes} \\ \cmidrule{8-8}
+			&	\large\textbf{Totaal te voldoen} &		&  &     &    &   &	\textbf{\scalebox{1.2}{\euro{} @{amount_gross}}} \\
+
+% INDIEN KORTING:			
+			
+%			&	\multicolumn{2}{l}{Extra korting} &  & &   &   &	\euro{} @{cformat(Decimal('0.1') * amount_net_)} \\ \cmidrule{8-8}
+%			&	\textbf{Totaal te voldoen met aftrek van korting} &  & &   &   &	& \euro{} @{cformat(amount_gross_ - Decimal('0.1') * amount_net_)}
+		\end{tabular}
+	\end{adjustwidth}	
+
+		% See if a QR code exists, if yes, print in the paper. Replace directory below with your own. Replace any underscores (_) with (\string_) because of the underscore package.
+		\IfFileExists{/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan\string_zangles/Gnucash\string_boekhouding/Facturen/LaTeX/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
+		{
+			Betalen kan ook door deze QR-code met de mobiele app van je bank te scannen:
+			\begin{center}
+				\includegraphics[width=4cm]{/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan\string_zangles/Gnucash\string_boekhouding/Facturen/LaTeX/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
+			\end{center}
+		}
+		{
+			% (Run this if file is not present.)
+		}
+			
+		\closing{Met vriendelijke groet,}
+	\end{letter}
+\end{document}
