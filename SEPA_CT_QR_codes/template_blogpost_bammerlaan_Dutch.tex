@@ -158,15 +158,15 @@
 	\end{adjustwidth}	
 
 		% See if a QR code exists, if yes, print in the paper. Replace directory below with your own. Replace any underscores (_) with (\string_) because of the underscore package.
-		\IfFileExists{/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan\string_zangles/Gnucash\string_boekhouding/Facturen/LaTeX/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
+		\IfFileExists{/path/to/your/invoice/directory/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
 		{
-			Betalen kan ook door deze QR-code met de mobiele app van je bank te scannen:
+			You can also pay by scanning this QR code with the smartphone app of your bank:
 			\begin{center}
-				\includegraphics[width=4cm]{/home/steelbas/Documents/Bestanden/Bestanden/bammerlaan\string_zangles/Gnucash\string_boekhouding/Facturen/LaTeX/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
+				\includegraphics[width=4cm]{/path/to/your/invoice/directory/QR\string_codes\string_SEPA/Factuur\string_@{id}\string_SEPACTQR.png}
 			\end{center}
 		}
 		{
-			% (Run this if file is not present.)
+			% (Anything here will be run if file is not present.)
 		}
 			
 		\closing{Met vriendelijke groet,}
