@@ -5,24 +5,33 @@
 INVOICE_NUMBER=''
 GNUCASH_DATABASE=''
 INVOICE_DIRECTORY=''
+BANK_ACCOUNT=''
+INFO_FIELD=''
+BANK_OWNER=''
 verbose='0'
 
 # Print help message on -h flag
-HELP="$(basename "$0") <-i> <-g> <-o> [-h] [-v] -- bash script that takes a GnuCash invoice number, database file and output directory, then downloads a SEPA Credit Transfer QR code to the output directory.
+HELP="$(basename "$0") <-i FILE> <-g FILE> <-o DIR> <-b INPUT> <-t INPUT> <-n INPUT> [-h] [-v] -- bash script that takes a GnuCash invoice number, database file and output directory, then downloads a SEPA Credit Transfer QR code to the output directory.
 
 where:
     -h  Show this help text
     -i  Give GnuCash input number
     -g  Give GnuCash database file location (*.gnucash)
     -o  Give desired output location
+    -b  Give IBAN bank account number
+    -t  Give text to print in the QR code's info field
+    -n  Give IBAN bank account owner's name
     -v  Print some semi-helpful verbose messages."
 
 # Configure flags. A colon after a flag means it expects an argument.
-while getopts 'i:g:o:vh' flag; do
+while getopts 'i:g:o:b:t:n:vh' flag; do
   case "${flag}" in
     i) INVOICE_NUMBER="${OPTARG}" ;;
     g) GNUCASH_DATABASE="${OPTARG}" ;;
     o) OUTPUT_DIRECTORY="${OPTARG}" ;;
+    b) BANK_ACCOUNT="${OPTARG}" ;;
+    t) INFO_FIELD="${OPTARG}" ;;
+    n) BANK_OWNER="${OPTARG}" ;;
     v) verbose='1' ;;
     h) echo "$HELP"
        exit
@@ -35,6 +44,9 @@ done
 readonly INVOICE_NUMBER
 readonly GNUCASH_DATABASE
 readonly OUTPUT_DIRECTORY
+readonly BANK_ACCOUNT
+readonly INFO_FIELD
+readonly BANK_OWNER
 
 # Define verbose function
 
@@ -46,8 +58,7 @@ function log () {
 
 DATE=$(date +%d-%m-%Y)
 
-# Edit below to your own situation. Replace spaces with %20.
-TEMPLATE_INPUT="https://epc-qr.eu/?iban=NL123456789A01&euro=@{amount_gross}&bname=Firstname%20Lastname,%20occupation&info=@{owner['full_name']},%20invoice%20number:%20@{id}"
+TEMPLATE_INPUT="https://epc-qr.eu/?iban=$BANK_ACCOUNT&euro=@{amount_gross}&bname=$BANK_OWNER&info=$INFO_FIELD"
 
 log "Invoice number: $INVOICE_NUMBER"
 log "GnuCash Database file: $GNUCASH_DATABASE"
